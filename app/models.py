@@ -21,7 +21,7 @@ class Event(models.Model):
 class Invitation(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     key = models.CharField(max_length=16, unique=True)
-    recipient = models.CharField(max_length=30)
+    recipient = models.CharField(max_length=32)
     count = models.SmallIntegerField(default=1)
 
 
