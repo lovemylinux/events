@@ -14,8 +14,8 @@ class Event(models.Model):
     image = models.ImageField()
     key = models.CharField(max_length=16, unique=True)
     deadline = models.DateTimeField()
-    budget = models.DecimalField(max_digits=9, decimal_places=2)
-    collected_money = models.DecimalField(max_digits=9, decimal_places=2)
+    budget = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
+    collected_money = models.DecimalField(max_digits=9, decimal_places=2, default=0)
 
 
 class Invitation(models.Model):
