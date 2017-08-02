@@ -34,7 +34,7 @@ class Hit(models.Model):
 
 
 class Decision(models.Model):
-    event = models.ForeignKey(Invitation, on_delete=models.CASCADE)
+    invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE)
     dtm = models.DateTimeField(auto_now_add=True)
     decision = models.BooleanField()
     is_valid = models.BooleanField(default=True)
