@@ -17,12 +17,24 @@ class Event(models.Model):
     budget = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
     collected_money = models.DecimalField(max_digits=9, decimal_places=2, default=0)
 
+    def __str__(self):
+        return 'Event({}, {})'.format(self.id, self.name)
+
+    def __repr__(self):
+        return 'Event({}, {})'.format(self.id, self.name)
+
 
 class Invitation(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     key = models.CharField(max_length=16, unique=True)
     recipient = models.CharField(max_length=32)
     count = models.SmallIntegerField(default=1)
+
+    def __str__(self):
+        return 'Invitation({}, {})'.format(self.id, self.recipient)
+
+    def __repr__(self):
+        return 'Invitation({}, {})'.format(self.id, self.recipient)
 
 
 class Hit(models.Model):
@@ -38,5 +50,6 @@ class Decision(models.Model):
     dtm = models.DateTimeField(auto_now_add=True)
     decision = models.BooleanField()
     is_valid = models.BooleanField(default=True)
+
 
 

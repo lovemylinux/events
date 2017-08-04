@@ -1,0 +1,43 @@
+{% extends 'events/base.html' %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="page-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+            <h1><a href="/">Просмотр отправляемых приглашений</a></h1>
+        </div>
+        <div class="content">
+                {% csrf_token %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Recipient</th>
+                            <th>Key</th>
+                            <th>Count</th>
+                            <th> </th>
+                        </tr>
+                    </thead>
+                      <tbody>
+                        {% for e in invitations %}
+                            <tr>
+                                <th>{{ forloop.counter }}</th>
+                                <td>{{ e.recipient }}</td>
+                                <td>{{ e.key }}</td>
+                                <form class="form" method="POST" action="/api/invitations/edit/{{e.id}}">
+                                    <td width="200px">
+                                        <input class="form-control"
+                                               disabled type="text"
+                                               value="{{e.count}}" name="count"
+                                               id="number-{{e.id}}"
+                                                ondblclick="$('#number-{{e.id}}').prop('disabled', false);">
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-primary" id="submit">submit</button>
+                                    </td>
+                                </form>
+                            </tr>
+                        {% endfor %}
+                      </tbody>
+                </table>
+        </div>
+    {% endif %}
+{% endblock %}
