@@ -1,11 +1,70 @@
-{% extends 'blog/base.html' %}
+{% extends 'events/base.html' %}
+{% load staticfiles %}
 {% block content %}
-    {% if user.is_authenticated %}
-        <div class="page-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-            <h1><a href="/">Просмотр приглашения</a></h1>
-        </div>
-        <div class="content">
-
-        </div>
-    {% endif %}
+    <div class="page-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+        <h1><a href="/">Просмотр приглашения</a></h1>
+    </div>
+    <div class="content">
+        <table class="table table-striped">
+        <tbody>
+            <tr>
+                <td>Event: </td>
+                <td>{{ event.name }}</td>
+            </tr>
+            <tr>
+                <td>Date info: </td>
+                <td>{{ event.dtm }}</td>
+            </tr>
+            <tr>
+                <td>Description: </td>
+                <td>{{ event.description }}</td>
+            </tr>
+            <tr>
+                <td>Creator: </td>
+                <td>{{ event.creator }}</td>
+            </tr>
+            <tr>
+                <td>Image: </td>
+                <td> <img style="max-height:500px; max-width:500px; height:auto; width:auto;"
+                                    src="/static/{{ event.image }}"
+                    >
+                </td>
+            </tr>
+            <tr>
+                <td>Recipient: </td>
+                <td>{{ invitation.recipient }}</td>
+            </tr>
+            <tr>
+                <td>Count: </td>
+                <td>{{ invitation.count }}</td>
+            </tr>
+            <tr>
+                <td>Deadline: </td>
+                <td>{{ event.deadline }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <form class="form" method="POST" action="/api/invitations/decision">
+                        {% csrf_token %}
+                            <input type="hidden" name="key" value="{{ invitation.key }}">
+                            <input type="hidden" name="id" value="{{ invitation.id }}">
+                            <button type="submit" value="no" name="decision" class="btn btn-primary" id="no">
+                                NO
+                            </button>
+                    </form>
+                </td>
+                <td>
+                    <form class="form" method="POST" action="/api/invitations/decision">
+                        {% csrf_token %}
+                            <input type="hidden" name="key" value="{{ invitation.key }}">
+                            <input type="hidden" name="id" value="{{ invitation.id }}">
+                            <button type="submit" value="yes" name="decision" class="btn btn-success" id="yes">
+                                YES
+                            </button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
 {% endblock %}

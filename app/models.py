@@ -1,5 +1,20 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.deconstruct import deconstructible
+import uuid, os
+
+
+@deconstructible
+class UploadToPathAndRename(object):
+    def __init__(self, path):
+        self.sub_path = path
+
+    def __call__(self, instance, filename):
+        ext = filename.split('.')[-1]
+        # set filename as random string
+        filename = '{}.{}'.format(uuid.uuid4().hex, ext)
+        # return the whole path to the file
+        return os.path.join(self.sub_path, filename)
 
 
 # Create your models here.
@@ -11,7 +26,7 @@ class Event(models.Model):
     address = models.CharField(max_length=128)
     creator = models.ForeignKey(User)
     description = models.TextField()
-    image = models.ImageField()
+    image = models.ImageField(upload_to=UploadToPathAndRename('app/static/images'))
     key = models.CharField(max_length=36, unique=True)
     deadline = models.DateTimeField()
     budget = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)

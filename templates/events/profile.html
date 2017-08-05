@@ -10,7 +10,7 @@
                         <tr>
                             <th>#</th>
                             <th>Recipient</th>
-                            <th>Key</th>
+                            <th>Link</th>
                             <th>Count</th>
                             <th> </th>
                             <th> </th>
@@ -21,7 +21,9 @@
                             <tr>
                                 <th>{{ forloop.counter }}</th>
                                 <td>{{ i.recipient }}</td>
-                                <td>{{ i.key }}</td>
+                                <td>
+                                    <a href="http://localhost:8000/invitation/{{ i.key }}">http://localhost:8000/invitation/{{ i.key }}</a>
+                                </td>
                                 <form class="form" method="POST" action="/api/invitations/edit/{{i.id}}">
                                     {% csrf_token %}
                                     <input type="hidden" name="id" value="{{ i.id }}">

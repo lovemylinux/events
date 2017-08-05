@@ -4,11 +4,25 @@ from .models import Event, Invitation, Decision
 import uuid
 
 
-@login_required(login_url='/admin')
-def decision(request):
-    context = {}
-    context['events'] = Event.objects.filter(creator=request.user)
-    return render(request, 'events/invite.html', context=context)
+def decision(request, key):
+    context = {
+        'invitation': Invitation.objects.filter(key=key).first(),
+    }
+    if context['invitation'] is None:
+        return HttpResponseRedirect('/')
+    context['event'] = context['invitation'].event
+    print(context['invitation'].event.image)
+    return render(request, 'events/invitation.html', context=context)
+
+
+def get_decision(request):
+    print(request.POST.get('decision'))
+    if request.POST.get('decision') == 'yes':
+        Decision.objects.filter(invitation=int(request.POST.get('id'))).update(decision=True)
+    else:
+        Decision.objects.filter(id=request.POST.get('id')).update(decision=False)
+    link = '/invitation/' + request.POST.get('key')
+    return HttpResponseRedirect(link)
 
 
 @login_required(login_url='/admin')
