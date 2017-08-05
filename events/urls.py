@@ -20,6 +20,9 @@ from app.views import *
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^invite/', invite),
+    url(r'^invitation/', decision),
     url(r'^api/invitations/add$', add_invite),
     url(r'^profile$', change),
+    url(r'^api/invitations/edit', change_invite),
+    url(r'^api/invitations/delete', delete_invite),
 ]

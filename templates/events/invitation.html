@@ -1,14 +1,11 @@
 {% extends 'blog/base.html' %}
 {% block content %}
-    <div class="page-header">
-        <h1><a href="/">Приглашение на мероприятие</a></h1>
-    </div>
-    <div class="content container">
-        <div class="row">
-            <div class="col-md-8">
-                <p>Информация о мероприятии</p>
-                { content }
-            </div>
+    {% if user.is_authenticated %}
+        <div class="page-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+            <h1><a href="/">Просмотр приглашения</a></h1>
         </div>
-    </div>
+        <div class="content">
+
+        </div>
+    {% endif %}
 {% endblock %}
