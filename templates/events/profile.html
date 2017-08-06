@@ -1,10 +1,10 @@
 {% extends 'events/base.html' %}
-{% block content %}
-    {% if user.is_authenticated %}
-        <div class="page-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-            <h1><a href="/">Просмотр отправляемых приглашений</a></h1>
-        </div>
+{% if user.is_authenticated %}
+    {% block content %}
         <div class="content">
+            <div>
+                <h1><a>Просмотр отправляемых приглашений</a></h1>
+            </div>
                 <table class="table table-hover">
                     <thead>
                         <tr>
@@ -39,7 +39,7 @@
                                 <form class="form" method="POST" action="/api/invitations/delete/{{i.id}}">
                                     {% csrf_token %}
                                     <td>
-                                        <button type="submit" value="{{ i.id }}" name="id" class="btn btn-primary" id="delete">
+                                        <button type="submit" value="{{ i.id }}" name="id" class="btn btn-danger" id="delete">
                                             delete
                                         </button>
                                     </td>
@@ -49,5 +49,5 @@
                       </tbody>
                 </table>
         </div>
-    {% endif %}
-{% endblock %}
+    {% endblock %}
+{% endif %}

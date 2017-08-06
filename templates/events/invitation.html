@@ -1,10 +1,10 @@
 {% extends 'events/base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <div class="page-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-        <h1><a href="/">Просмотр приглашения</a></h1>
-    </div>
     <div class="content">
+            <div>
+                <h1><a>Просмотр приглашения</a></h1>
+            </div>
         <table class="table table-striped">
         <tbody>
             <tr>
@@ -44,27 +44,40 @@
             </tr>
             <tr>
                 <td>
-                    <form class="form" method="POST" action="/api/invitations/decision">
-                        {% csrf_token %}
-                            <input type="hidden" name="key" value="{{ invitation.key }}">
-                            <input type="hidden" name="id" value="{{ invitation.id }}">
-                            <button type="submit" value="no" name="decision" class="btn btn-primary" id="no">
-                                NO
-                            </button>
-                    </form>
                 </td>
                 <td>
-                    <form class="form" method="POST" action="/api/invitations/decision">
+                    <form class="form-inline" method="POST" action="/api/invitations/decision">
                         {% csrf_token %}
-                            <input type="hidden" name="key" value="{{ invitation.key }}">
-                            <input type="hidden" name="id" value="{{ invitation.id }}">
-                            <button type="submit" value="yes" name="decision" class="btn btn-success" id="yes">
-                                YES
+                        <input type="hidden" name="key" value="{{ invitation.key }}">
+                        <input type="hidden" name="id" value="{{ invitation.id }}">
+                        <div class="form-group">
+                            <button type="submit" value="no" name="decision" {{deadline}} class="btn {{ false }} {{deadline}}" id="no">
+                                You are not attending
                             </button>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" value="yes" name="decision" {{deadline}} class="btn {{ true }} {{deadline}}" id="yes">
+                                I'll be there
+                            </button>
+                        </div>
                     </form>
                 </td>
             </tr>
         </tbody>
     </table>
+        <div id="map" class="map-container"></div>
+
+        <script>
+            function myMap() {
+              var myCenter = new google.maps.LatLng({{event.lat}},{{event.lon}});
+              var mapCanvas = document.getElementById("map");
+              var mapOptions = {center: myCenter, zoom: 5};
+              var map = new google.maps.Map(mapCanvas, mapOptions);
+              var marker = new google.maps.Marker({position:myCenter});
+              marker.setMap(map);
+            }
+        </script>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDuTTIyFhRVh6Ts0EtUlhHJyObUfSC9Tm0&callback=myMap"></script>
     </div>
 {% endblock %}

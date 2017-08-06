@@ -1,13 +1,12 @@
 {% extends 'events/base.html' %}
 {% load staticfiles %}
-{% block content %}
-    {% if user.is_authenticated %}
+{% if user.is_authenticated %}
+    {% block content %}
         <script src="{% static 'admin.js' %}"></script>
-
-        <div class="page-header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-            <h1><a href="/">Генерация приглашений</a></h1>
-        </div>
         <div class="content">
+            <div>
+                <h1><a>Генерация приглашений</a></h1>
+            </div>
             <form class="form-inline" method="POST" action="/api/invitations/add">
                 {% csrf_token %}
                 <label class="mr-sm-2" for="inlineFormCustomSelect">Выберите мероприятие</label>
@@ -22,11 +21,12 @@
                 <input class="form-control" type="text" value="1" maxlength="2" name="count" id="number-input">
 
                 <button type="button" class="btn btn-primary" id="generate">generate</button>
-
                 <div class="invitations"></div>
+
+
 
                 <button type="submit" class="btn btn-primary" id="submit">submit</button>
             </form>
         </div>
-    {% endif %}
-{% endblock %}
+    {% endblock %}
+{% endif %}

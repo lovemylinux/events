@@ -1,6 +1,8 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from .models import Event, Invitation, Decision
+from datetime import datetime, timezone
+
 import uuid
 
 
@@ -11,16 +13,23 @@ def decision(request, key):
     if context['invitation'] is None:
         return HttpResponseRedirect('/')
     context['event'] = context['invitation'].event
-    print(context['invitation'].event.image)
+    if Decision.objects.filter(invitation=int(context['invitation'].id)).first().decision is True:
+        context['true'] = 'btn-primary'
+        context['false'] = ''
+    else:
+        context['false'] = 'btn-primary'
+        context['true'] = ''
+    context['deadline'] = ''
+    if datetime.now(timezone.utc) > context['event'].deadline:
+        context['deadline'] = 'disabled'
     return render(request, 'events/invitation.html', context=context)
 
 
 def get_decision(request):
-    print(request.POST.get('decision'))
     if request.POST.get('decision') == 'yes':
         Decision.objects.filter(invitation=int(request.POST.get('id'))).update(decision=True)
     else:
-        Decision.objects.filter(id=request.POST.get('id')).update(decision=False)
+        Decision.objects.filter(invitation=int(request.POST.get('id'))).update(decision=False)
     link = '/invitation/' + request.POST.get('key')
     return HttpResponseRedirect(link)
 

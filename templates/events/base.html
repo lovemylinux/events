@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js">
     <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     <script
           src="http://code.jquery.com/jquery-3.2.1.min.js"
           integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
@@ -15,6 +15,23 @@
     </script>
 </head>
 <body>
+     <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header navbar-brand">
+          Events
+        </div>
+          {% if user.is_authenticated %}
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="http://localhost:8000/profile">Profile</a></li>
+              <li><a href="http://localhost:8000/invite">Create invitation</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://localhost:8000/admin/logout"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+              <li><a href="http://localhost:8000/admin/"><span class="glyphicon glyphicon-log-in"></span> Admin</a></li>
+            </ul>
+          {% endif %}
+      </div>
+    </nav>
     {% block content %}
     {% endblock %}
 </body>
