@@ -1,9 +1,13 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from .models import Event, Invitation, Decision
+from .models import Event, Invitation, Decision, Hit
 from datetime import datetime, timezone
 
 import uuid
+
+
+def handler404(request):
+    return render(request, 'events/404.html')
 
 
 def decision(request, key):
@@ -11,7 +15,14 @@ def decision(request, key):
         'invitation': Invitation.objects.filter(key=key).first(),
     }
     if context['invitation'] is None:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect('/404')
+    new_hit = Hit(
+        invitation_id=context['invitation'].id,
+        user_agent=request.META['HTTP_USER_AGENT'],
+        ip=get_client_ip(request),
+        referal=request.META.get('HTTP_REFERER'),
+    )
+    new_hit.save()
     context['event'] = context['invitation'].event
     if Decision.objects.filter(invitation=int(context['invitation'].id)).first().decision is True:
         context['true'] = 'btn-primary'
@@ -50,11 +61,12 @@ def add_invite(request):
             recipient=request.POST.get('contact' + str(i)),
             count=int(request.POST.get('quantity' + str(i))),
         )
-        new_invitation.save()
-        new_decision = Decision(
-            invitation_id=int(new_invitation.id)
-        )
-        new_decision.save()
+        if new_invitation.event.creator == request.user:
+            new_invitation.save()
+            new_decision = Decision(
+                invitation_id=int(new_invitation.id)
+            )
+            new_decision.save()
     return HttpResponseRedirect('/profile')
 
 
@@ -73,11 +85,35 @@ def change(request):
 
 @login_required(login_url='/admin')
 def change_invite(request):
-    Invitation.objects.filter(id=request.POST.get('id')).update(count=request.POST.get('count'))
+    if get_creator(request) == request.user:
+        Invitation.objects.filter(id=request.POST.get('id')).update(count=request.POST.get('count'))
+    else:
+        return HttpResponseRedirect('/404')
     return HttpResponseRedirect('/profile')
 
 
 @login_required(login_url='/admin')
 def delete_invite(request):
-    Invitation.objects.filter(id=request.POST.get('id')).delete()
+    if get_creator(request) == request.user:
+        Invitation.objects.filter(id=request.POST.get('id')).delete()
+    else:
+        return HttpResponseRedirect('/404')
     return HttpResponseRedirect('/profile')
+
+
+def get_creator(request):
+    return Event.objects.filter(
+        id=Invitation.objects.filter(id=int(request.POST.get('id'))).first().event.id).first().creator
+
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+def not_found(request):
+    return render(request, 'events/404.html')

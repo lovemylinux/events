@@ -60,10 +60,10 @@ class Hit(models.Model):
     ip = models.GenericIPAddressField()
 
     def __str__(self):
-        return 'Hit({}, {})'.format(self.id, self.name)
+        return 'Hit({}, {})'.format(self.id, self.user_agent)
 
     def __repr__(self):
-        return 'Hit({}, {})'.format(self.id, self.name)
+        return 'Hit({}, {})'.format(self.id, self.user_agent)
 
 
 class Decision(models.Model):
