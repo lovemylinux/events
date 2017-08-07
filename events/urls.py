@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^api/invitations/edit', change_invite),
     url(r'^api/invitations/delete', delete_invite),
     url(r'^api/invitations/decision$', get_decision),
+    url(r'^api/invitations/change$', change),
 ]
 
 handler404 = handler404

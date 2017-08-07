@@ -7,7 +7,7 @@ import uuid
 
 
 def handler404(request):
-    return render(request, 'events/404.html')
+    return HttpResponseRedirect('events/404.html')
 
 
 def decision(request, key):
@@ -24,23 +24,28 @@ def decision(request, key):
     )
     new_hit.save()
     context['event'] = context['invitation'].event
-    if Decision.objects.filter(invitation=int(context['invitation'].id)).first().decision is True:
-        context['true'] = 'btn-primary'
-        context['false'] = ''
+    if Decision.objects.filter(invitation=int(context['invitation'].id)).last().decision is True:
+        context['true'] = ['btn-primary', 'disabled']
+        context['false'] = ['', '']
     else:
-        context['false'] = 'btn-primary'
-        context['true'] = ''
-    context['deadline'] = ''
+        context['false'] = ['btn-primary', 'disabled']
+        context['true'] = ['', '']
     if datetime.now(timezone.utc) > context['event'].deadline:
         context['deadline'] = 'disabled'
     return render(request, 'events/invitation.html', context=context)
 
 
 def get_decision(request):
+    Decision.objects.filter(invitation=int(request.POST.get('id'))).update(is_valid=False)
+    new_decision = Decision(
+        invitation_id=int(request.POST.get('id'))
+    )
     if request.POST.get('decision') == 'yes':
-        Decision.objects.filter(invitation=int(request.POST.get('id'))).update(decision=True)
-    else:
-        Decision.objects.filter(invitation=int(request.POST.get('id'))).update(decision=False)
+        new_decision.decision = True
+        new_decision.save()
+    elif request.POST.get('decision') == 'no':
+        new_decision.decision = False
+        new_decision.save()
     link = '/invitation/' + request.POST.get('key')
     return HttpResponseRedirect(link)
 
@@ -73,7 +78,13 @@ def add_invite(request):
 @login_required(login_url='/admin')
 def change(request):
     context = {}
-    context['events'] = Event.objects.filter(creator=request.user)
+    context['user_events'] = Event.objects.filter(creator=request.user)
+    if request.POST.get('event') is not None:
+        context['events'] = Event.objects.filter(creator=request.user).filter(id=int(request.POST.get('event')))
+        context['selected_event'] = Event.objects.filter(id=int(request.POST.get('event'))).first().name
+    else:
+        context['events'] = context['user_events']
+        context['selected_event'] = 'All events'
     invitations = []
     for e in context['events']:
         invitations += [
