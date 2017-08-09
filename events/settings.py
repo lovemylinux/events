@@ -129,6 +129,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'app/static'
+MEDIA_ROOT = 'app/static/'
 
 PROJECT_DOMAIN = 'evening-ocean-72138.herokuapp.com'
 PROJECT_PORT = '80'

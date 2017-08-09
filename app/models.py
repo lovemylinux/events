@@ -26,7 +26,7 @@ class Event(models.Model):
     address = models.CharField(max_length=128)
     creator = models.ForeignKey(User)
     description = models.TextField()
-    image = models.ImageField(upload_to=UploadToPathAndRename('app/static/images'))
+    image = models.ImageField(upload_to=UploadToPathAndRename('images'))
     key = models.CharField(max_length=36, unique=True)
     deadline = models.DateTimeField()
     budget = models.DecimalField(max_digits=9, decimal_places=2, null=True, blank=True)
