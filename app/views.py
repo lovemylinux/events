@@ -1,7 +1,11 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from .models import Event, Invitation, Decision, Hit
 from datetime import datetime, timezone
+
+from django.conf import settings
+
 
 import uuid
 
@@ -10,7 +14,7 @@ def handler404(request):
     return HttpResponseRedirect('events/404.html')
 
 
-def decision(request, key):
+def invitation(request, key):
     context = {
         'invitation': Invitation.objects.filter(key=key).first(),
     }
@@ -51,7 +55,7 @@ def get_decision(request):
 
 
 @login_required(login_url='/admin')
-def invite(request):
+def create_invite(request):
     context = {}
     context['events'] = Event.objects.filter(creator=request.user)
     return render(request, 'events/invite.html', context=context)
@@ -76,21 +80,31 @@ def add_invite(request):
 
 
 @login_required(login_url='/admin')
-def change(request):
+def profile(request):
     context = {}
-    context['user_events'] = Event.objects.filter(creator=request.user)
-    if request.POST.get('event') is not None:
-        context['events'] = Event.objects.filter(creator=request.user).filter(id=int(request.POST.get('event')))
-        context['selected_event'] = Event.objects.filter(id=int(request.POST.get('event'))).first().name
-    else:
-        context['events'] = context['user_events']
-        context['selected_event'] = 'All events'
     invitations = []
-    for e in context['events']:
+
+    context['invitations'] = invitations
+    context['domain_port'] = settings.PROJECT_DOMAIN + ':' + settings.PROJECT_PORT
+    context['events'] = Event.objects.filter(creator=request.user)
+    context['filter_by_event'] = -1
+
+    events_to_show = context['events']
+
+    try:
+        filter_by_event = int(request.GET['filter_by_event'])
+        events_to_show = context['events'].filter(id=filter_by_event)
+        context['filter_by_event'] = filter_by_event
+    except:
+        pass
+
+    for e in events_to_show:
         invitations += [
             *list(Invitation.objects.filter(event=e.id))
         ]
-    context['invitations'] = invitations
+
+    context['empty_invitations'] = True if len(invitations) == 0 else False
+
     return render(request, 'events/profile.html', context=context)
 
 
@@ -99,7 +113,7 @@ def change_invite(request):
     if get_creator(request) == request.user:
         Invitation.objects.filter(id=request.POST.get('id')).update(count=request.POST.get('count'))
     else:
-        return HttpResponseRedirect('/404')
+        raise Http404
     return HttpResponseRedirect('/profile')
 
 
@@ -108,13 +122,16 @@ def delete_invite(request):
     if get_creator(request) == request.user:
         Invitation.objects.filter(id=request.POST.get('id')).delete()
     else:
-        return HttpResponseRedirect('/404')
+        raise Http404
     return HttpResponseRedirect('/profile')
 
 
 def get_creator(request):
     return Event.objects.filter(
-        id=Invitation.objects.filter(id=int(request.POST.get('id'))).first().event.id).first().creator
+        id=Invitation.objects.filter(
+            id=int(request.POST.get('id'))
+        ).first().event.id
+    ).first().creator
 
 
 def get_client_ip(request):

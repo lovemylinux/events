@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'e43)c7vbluy$0qlbq71-gq#!xsx)m0)_k6(vc&fh7x2kg^wl3d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'bootstrap',
 ]
 
 MIDDLEWARE = [
@@ -112,11 +113,11 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
-USE_I18N = True
+USE_I18N = False
 
 USE_L10N = True
 
@@ -128,6 +129,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+
+PROJECT_DOMAIN = 'localhost'
+PROJECT_PORT = '8000'
 
 try:
     from .local_settings import *

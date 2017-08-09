@@ -33,7 +33,7 @@ class Event(models.Model):
     collected_money = models.DecimalField(max_digits=9, decimal_places=2, default=0)
 
     def __str__(self):
-        return 'Event({}, {})'.format(self.id, self.name)
+        return self.name
 
     def __repr__(self):
         return 'Event({}, {})'.format(self.id, self.name)
@@ -46,7 +46,7 @@ class Invitation(models.Model):
     count = models.SmallIntegerField(default=1)
 
     def __str__(self):
-        return 'Invitation({}, {})'.format(self.id, self.recipient)
+        return '{}({})'.format(self.recipient, self.event)
 
     def __repr__(self):
         return 'Invitation({}, {})'.format(self.id, self.recipient)
@@ -60,7 +60,7 @@ class Hit(models.Model):
     ip = models.GenericIPAddressField()
 
     def __str__(self):
-        return 'Hit({}, {})'.format(self.id, self.user_agent)
+        return '{}({})'.format(self.invitation.recipient, self.dtm.strftime("%Y-%m-%d %H:%M:%S"))
 
     def __repr__(self):
         return 'Hit({}, {})'.format(self.id, self.user_agent)
@@ -73,7 +73,7 @@ class Decision(models.Model):
     is_valid = models.BooleanField(default=True)
 
     def __str__(self):
-        return 'Decision({}, {})'.format(self.id, self.decision)
+        return '{}({})'.format(self.invitation.recipient, self.decision)
 
     def __repr__(self):
         return 'Decision({}, {})'.format(self.id, self.decision)

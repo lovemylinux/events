@@ -21,15 +21,15 @@ from django.conf.urls import handler404
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^invite/', invite),
+    url(r'^invite/', create_invite, name='invite'),
     url(r'^404/', not_found),
-    url(r'^invitation/([-A-Za-z0-9]{36})', decision),
-    url(r'^profile$', change),
+    url(r'^invitation/([-A-Za-z0-9]{36})', invitation, name='invitation'),
+    url(r'^profile$', profile, name='profile'),
     url(r'^api/invitations/add$', add_invite),
     url(r'^api/invitations/edit', change_invite),
     url(r'^api/invitations/delete', delete_invite),
     url(r'^api/invitations/decision$', get_decision),
-    url(r'^api/invitations/change$', change),
+    url(r'^api/invitations/change$', profile),
 ]
 
 handler404 = handler404

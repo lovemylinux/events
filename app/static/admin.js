@@ -17,8 +17,8 @@ function buildInvitationsBlocks(e) {
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Recipient</th>
-                            <th>Count</th>
+                            <th>Получатель</th>
+                            <th>Количество</th>
                         </tr>
                     </thead>
                     <tbody>

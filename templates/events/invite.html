@@ -1,7 +1,7 @@
 {% extends 'events/base.html' %}
 {% load staticfiles %}
 {% block title %}
-    Create invitations
+    Создать приглашение
 {% endblock %}
 {% if user.is_authenticated %}
     {% block content %}
@@ -14,7 +14,7 @@
                 {% csrf_token %}
                 <label class="mr-sm-2" for="inlineFormCustomSelect">Выберите мероприятие</label>
                 <select name="event" class="custom-select mb-2 mr-sm-2 mb-sm-0" id="inlineFormCustomSelect">
-                    <option selected>Choose...</option>
+                    <option selected>...</option>
                     {% for e in events %}
                         <option value="{{ e.id }}">{{ e.name }}</option>
                     {% endfor %}
@@ -23,12 +23,12 @@
                 <label for="number-input" class="col-2 col-form-label">Number</label>
                 <input class="form-control" type="text" value="1" maxlength="2" name="count" id="number-input">
 
-                <button type="button" class="btn btn-primary" id="generate">generate</button>
+                <button type="button" class="btn btn-primary" id="generate">Сгенерировать</button>
                 <div class="invitations"></div>
 
 
 
-                <button type="submit" class="btn btn-primary" id="submit">submit</button>
+                <button type="submit" class="btn btn-primary" id="submit">Отправить</button>
             </form>
         </div>
     {% endblock %}

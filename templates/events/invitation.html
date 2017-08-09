@@ -1,7 +1,7 @@
 {% extends 'events/base.html' %}
 {% load staticfiles %}
 {% block title %}
-    Invitation
+    Приглашение
 {% endblock %}
 {% block content %}
     <div class="content">
@@ -11,38 +11,38 @@
         <table class="table table-striped">
         <tbody>
             <tr>
-                <td>Event: </td>
+                <td>Мероприятие: </td>
                 <td>{{ event.name }}</td>
             </tr>
             <tr>
-                <td>Date info: </td>
+                <td>Дата: </td>
                 <td>{{ event.dtm }}</td>
             </tr>
             <tr>
-                <td>Description: </td>
+                <td>Описание: </td>
                 <td>{{ event.description }}</td>
             </tr>
             <tr>
-                <td>Creator: </td>
+                <td>Создатель: </td>
                 <td>{{ event.creator }}</td>
             </tr>
             <tr>
-                <td>Image: </td>
+                <td>Фото: </td>
                 <td> <img style="max-height:500px; max-width:500px; height:auto; width:auto;"
                                     src="/static/images/{{ event.image }}"
                     >
                 </td>
             </tr>
             <tr>
-                <td>Recipient: </td>
+                <td>Получатель: </td>
                 <td>{{ invitation.recipient }}</td>
             </tr>
             <tr>
-                <td>Count: </td>
+                <td>Количество: </td>
                 <td>{{ invitation.count }}</td>
             </tr>
             <tr>
-                <td>Deadline: </td>
+                <td>Крайний срок: </td>
                 <td>{{ event.deadline }}</td>
             </tr>
             <tr>
@@ -55,12 +55,12 @@
                         <input type="hidden" name="id" value="{{ invitation.id }}">
                         <div class="form-group">
                             <button type="submit" value="no" name="decision" {{ false.1 }} {{deadline}} class="btn {{ false.0 }} {{deadline}}" id="no">
-                                You are not attending
+                                Точно не иду
                             </button>
                         </div>
                         <div class="form-group">
                             <button type="submit" value="yes" name="decision" {{ true.1 }} {{deadline}} class="btn {{ true.0 }} {{deadline}}" id="yes">
-                                I'll be there
+                                Иду
                             </button>
                         </div>
                     </form>
