@@ -20,7 +20,7 @@ from app.views import *
 
 
 urlpatterns = [
-    url(r'^/', index, name='index'),
+    url(r'^$', index, name='index'),
     url(r'^admin/', admin.site.urls),
     url(r'^invite/', create_invite, name='invite'),
     url(r'^invitation/([-A-Za-z0-9]{36})', invitation, name='invitation'),
@@ -30,4 +30,4 @@ urlpatterns = [
     url(r'^api/invitations/delete', delete_invite),
     url(r'^api/invitations/decision$', get_decision),
     url(r'^api/invitations/change$', profile),
-]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
