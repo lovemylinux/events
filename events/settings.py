@@ -133,11 +133,6 @@ STATIC_ROOT = 'app/static'
 PROJECT_DOMAIN = 'localhost'
 PROJECT_PORT = '8000'
 
-try:
-    from .local_settings import *
-except ImportError as e:
-    raise Exception('Unable to find local settings') from e
-
 # Настройки Heroku
 if os.getcwd() == '/app':
     import dj_database_url
@@ -155,3 +150,8 @@ if os.getcwd() == '/app':
     STATICFILES_DIRS = (
         os.path.join(BASE_DIR, 'static'),
     )
+else:
+    try:
+        from .local_settings import *
+    except ImportError as e:
+        raise Exception('Unable to find local settings') from e
