@@ -20,6 +20,7 @@ from app.views import *
 
 
 urlpatterns = [
+    url(r'^/', index, name='index'),
     url(r'^admin/', admin.site.urls),
     url(r'^invite/', create_invite, name='invite'),
     url(r'^invitation/([-A-Za-z0-9]{36})', invitation, name='invitation'),

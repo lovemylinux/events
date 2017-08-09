@@ -8,6 +8,10 @@ import uuid
 from .models import Event, Invitation, Decision, Hit
 
 
+def index(request):
+    return render(request, 'events/index.html')
+
+
 def invitation(request, key):
     """
     Страница, показывающая информацию о приглашении
