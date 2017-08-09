@@ -2,3 +2,4 @@ local_settings.py
 .idea
 */migrations
 */__pycache__
+*/images
