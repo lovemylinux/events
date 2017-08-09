@@ -8,15 +8,9 @@
         {% endblock %}
     </title>
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-    <link href='//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="{% static 'style.css' %}">
     <script src="{% static 'bootstrap/js/jquery.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-    <script
-          src="http://code.jquery.com/jquery-3.2.1.min.js"
-          integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-          crossorigin="anonymous">
-    </script>
 </head>
 <body>
      <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -30,8 +24,8 @@
               <li><a href="{% url 'invite' %}">Создать приглашение</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-              <li><a href="http://localhost:8000/admin/logout"><span class="glyphicon glyphicon-user"></span> Выйти</a></li>
-              <li><a href="http://localhost:8000/admin/"><span class="glyphicon glyphicon-log-in"></span> Войти</a></li>
+              <li><a href="/admin/logout"><span class="glyphicon glyphicon-user"></span> Выйти</a></li>
+              <li><a href="/admin/"><span class="glyphicon glyphicon-log-in"></span> Войти</a></li>
             </ul>
           {% endif %}
       </div>

@@ -15,14 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.conf.urls.static import static
 from app.views import *
-from django.conf.urls import handler404
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^invite/', create_invite, name='invite'),
-    url(r'^404/', not_found),
     url(r'^invitation/([-A-Za-z0-9]{36})', invitation, name='invitation'),
     url(r'^profile$', profile, name='profile'),
     url(r'^api/invitations/add$', add_invite),
@@ -30,6 +29,4 @@ urlpatterns = [
     url(r'^api/invitations/delete', delete_invite),
     url(r'^api/invitations/decision$', get_decision),
     url(r'^api/invitations/change$', profile),
-]
-
-handler404 = handler404
+]  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

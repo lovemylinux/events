@@ -1,20 +1,18 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
-from .models import Event, Invitation, Decision, Hit
 from datetime import datetime, timezone
-
 from django.conf import settings
-
-
 import uuid
 
-
-def handler404(request):
-    return HttpResponseRedirect('events/404.html')
+from .models import Event, Invitation, Decision, Hit
 
 
 def invitation(request, key):
+    """
+    Страница, показывающая информацию о приглашении
+    :param key: Хэш приглашения
+    """
     context = {
         'invitation': Invitation.objects.filter(key=key).first(),
     }
@@ -141,7 +139,3 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
-
-
-def not_found(request):
-    return render(request, 'events/404.html')
