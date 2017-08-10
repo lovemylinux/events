@@ -1,5 +1,6 @@
 {% extends 'events/base.html' %}
 {% load staticfiles %}
+{% load l10n %}
 {% block title %}
     Приглашение
 {% endblock %}
@@ -29,7 +30,7 @@
             <tr>
                 <td>Фото: </td>
                 <td> <img style="max-height:500px; max-width:500px; height:auto; width:auto;"
-                                    src="/static/images/{{ event.image }}"
+                                    src="/static/{{ event.image }}"
                     >
                 </td>
             </tr>
@@ -72,9 +73,9 @@
 
         <script>
             function myMap() {
-              var myCenter = new google.maps.LatLng({{event.lat}},{{event.lon}});
+              var myCenter = new google.maps.LatLng({{event.lat|unlocalize}},{{event.lon|unlocalize}});
               var mapCanvas = document.getElementById("map");
-              var mapOptions = {center: myCenter, zoom: 5};
+              var mapOptions = {center: myCenter, zoom: 17};
               var map = new google.maps.Map(mapCanvas, mapOptions);
               var marker = new google.maps.Marker({position:myCenter});
               marker.setMap(map);

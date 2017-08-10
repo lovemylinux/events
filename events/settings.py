@@ -129,11 +129,31 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'app/static'
+MEDIA_ROOT = 'app/static/'
 
-PROJECT_DOMAIN = 'localhost'
-PROJECT_PORT = '8000'
+PROJECT_DOMAIN = 'evening-ocean-72138.herokuapp.com'
+PROJECT_PORT = '80'
 
-try:
-    from .local_settings import *
-except ImportError as e:
-    raise Exception('Unable to find local settings') from e
+if True:
+    # Настройки Heroku
+    import dj_database_url
+
+    DATABASES = {
+        'default': dj_database_url.config(default='postgres://localhost')
+    }
+    # Поддержка заголовка 'X-Forwarded-Proto' для request.is_secure().
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # Разрешены все заголовки хостов.
+    ALLOWED_HOSTS = ['*']
+
+    # Конфигурация статических ресурсов
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static'),
+    )
+else:
+    try:
+        from .local_settings import *
+    except ImportError as e:
+        raise Exception('Unable to find local settings') from e
