@@ -3,37 +3,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% block title %}
         {% endblock %}
     </title>
-    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous">
+    </script>
+
     <link rel="stylesheet" href="{% static 'style.css' %}">
-    <script src="{% static 'bootstrap/js/jquery.min.js' %}"></script>
-    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 </head>
 <body>
-     <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header navbar-brand">
-          <a href="{% url 'index' %}">Мероприятия</a>
-        </div>
-          {% if user.is_authenticated %}
-            <ul class="nav navbar-nav">
-              <li class="active"><a href="{% url 'profile' %}">Профиль</a></li>
-              <li><a href="{% url 'invite' %}">Создать приглашение</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-              <li><a href="/admin/logout"><span class="glyphicon glyphicon-user"></span> Выйти</a></li>
-              <li><a href="/admin/"><span class="glyphicon glyphicon-log-in"></span> Управление</a></li>
-            </ul>
-          {% else %}
-              <ul class="nav navbar-nav">
-                <li><a href="/admin/"><span class="glyphicon glyphicon-log-in"></span> Войти</a></li>
-              </ul>
-          {% endif %}
-      </div>
-    </nav>
+    {% if request.resolver_match.url_name != 'show_invitation' %}
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header navbar-brand">
+                    <a href="{% url 'index' %}">Мероприятия</a>
+                </div>
+                {% if user.is_authenticated %}
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="{% url 'dashboard' %}">Панель управления</a></li>
+                        <li><a href="{% url 'invite' %}">Создать приглашение</a></li>
+                    </ul>
+                {% endif %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-user"></span> Выйти</a></li>
+                    <li><a href="{% url 'admin:index' %}"><span class="glyphicon glyphicon-log-in"></span> Управление</a></li>
+                </ul>
+            </div>
+        </nav>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
 </body>

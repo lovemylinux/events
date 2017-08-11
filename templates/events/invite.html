@@ -10,7 +10,7 @@
             <div>
                 <h1>Генерация приглашений</h1>
             </div>
-            <form class="form-inline" method="POST" action="/api/invitations/add">
+            <form class="form-inline" method="POST" action="{% url 'api_add_invite' %}">
                 {% csrf_token %}
                 <label class="mr-sm-2" for="inlineFormCustomSelect">Выберите мероприятие</label>
                 <select name="event" class="custom-select mb-2 mr-sm-2 mb-sm-0" id="inlineFormCustomSelect">

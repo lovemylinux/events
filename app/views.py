@@ -1,36 +1,90 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from datetime import datetime, timezone
-from django.conf import settings
 import uuid
 
 from .models import Event, Invitation, Decision, Hit
 
 
-def index(request):
+def show_index_page(request):
+    """
+    Показать главноую страницу
+    :param request:
+    """
     return render(request, 'events/index.html')
 
 
-def invitation(request, key):
+@login_required
+def show_dashboard_page(request):
+    """
+
+    :param request:
+    """
+    events_to_show = events = Event.objects.filter(creator=request.user)
+
+    # Check if filter param is valid and exists
+    filtering_event_str = request.GET.get('filter_by_event')
+    if filtering_event_str and filtering_event_str.isdigit():
+        events_to_show = events.filter(id=int(filtering_event_str))
+        filtering_event_str = int(filtering_event_str)
+    else:
+        filtering_event_str = ''
+
+    invitations = []
+    for e in events_to_show:
+        invitations += list(Invitation.objects.filter(event=e.id))
+
+    context = {
+        'invitations': invitations,
+        'events': events,
+        'filter_by_event': filtering_event_str
+    }
+
+    return render(request, 'events/profile.html', context=context)
+
+
+@login_required
+def show_create_invite_page(request):
+    """
+    Страница создания новых инвайтов
+    :param request:
+    """
+    return render(request, 'events/invite.html', context={
+        'events': Event.objects.filter(creator=request.user),
+    })
+
+
+def show_invitation(request, key):
     """
     Страница, показывающая информацию о приглашении
     :param key: Хэш приглашения
     """
+    target_invitation = Invitation.objects.filter(key=key).first()
+
+    if target_invitation is None:
+        raise Http404
+
+    target_event = target_invitation.event
+
     context = {
-        'invitation': Invitation.objects.filter(key=key).first(),
+        'invitation': target_invitation,
+        'event': target_event,
     }
-    if context['invitation'] is None:
-        return HttpResponseRedirect('/404')
+
+    # Логирование
     new_hit = Hit(
-        invitation_id=context['invitation'].id,
+        invitation_id=target_invitation.id,
         user_agent=request.META['HTTP_USER_AGENT'],
-        ip=get_client_ip(request),
+        ip=request.META.get('REMOTE_ADDR'),
         referal=request.META.get('HTTP_REFERER'),
     )
     new_hit.save()
-    context['event'] = context['invitation'].event
-    if Decision.objects.filter(invitation=int(context['invitation'].id)).last().decision is True:
+
+    # Изменить стиль кнопок
+    if Decision.objects.filter(invitation=int(target_invitation.id)).last().decision is True:
         context['true'] = ['btn-primary', 'disabled']
         context['false'] = ['', '']
     else:
@@ -38,33 +92,20 @@ def invitation(request, key):
         context['true'] = ['', '']
     if datetime.now(timezone.utc) > context['event'].deadline:
         context['deadline'] = 'disabled'
+
     return render(request, 'events/invitation.html', context=context)
 
 
-def get_decision(request):
-    Decision.objects.filter(invitation=int(request.POST.get('id'))).update(is_valid=False)
-    new_decision = Decision(
-        invitation_id=int(request.POST.get('id'))
-    )
-    if request.POST.get('decision') == 'yes':
-        new_decision.decision = True
-        new_decision.save()
-    elif request.POST.get('decision') == 'no':
-        new_decision.decision = False
-        new_decision.save()
-    link = '/invitation/' + request.POST.get('key')
-    return HttpResponseRedirect(link)
+# API
 
 
-@login_required(login_url='/admin')
-def create_invite(request):
-    context = {}
-    context['events'] = Event.objects.filter(creator=request.user)
-    return render(request, 'events/invite.html', context=context)
-
-
-@login_required(login_url='/admin')
+@login_required
 def add_invite(request):
+    """
+    Создать новые инвайты
+    :param request:
+    :return:
+    """
     for i in range(int(request.POST['count'])):
         new_invitation = Invitation(
             event_id=int(request.POST.get('event')),
@@ -78,68 +119,64 @@ def add_invite(request):
                 invitation_id=int(new_invitation.id)
             )
             new_decision.save()
-    return HttpResponseRedirect('/profile')
+        else:
+            raise PermissionDenied
+    return HttpResponseRedirect(reverse('dashboard'))
 
 
-@login_required(login_url='/admin')
-def profile(request):
-    context = {}
-    invitations = []
-
-    context['invitations'] = invitations
-    context['domain_port'] = settings.PROJECT_DOMAIN + ':' + settings.PROJECT_PORT
-    context['events'] = Event.objects.filter(creator=request.user)
-    context['filter_by_event'] = -1
-
-    events_to_show = context['events']
-
-    try:
-        filter_by_event = int(request.GET['filter_by_event'])
-        events_to_show = context['events'].filter(id=filter_by_event)
-        context['filter_by_event'] = filter_by_event
-    except:
-        pass
-
-    for e in events_to_show:
-        invitations += [
-            *list(Invitation.objects.filter(event=e.id))
-        ]
-
-    context['empty_invitations'] = True if len(invitations) == 0 else False
-
-    return render(request, 'events/profile.html', context=context)
-
-
-@login_required(login_url='/admin')
+@login_required
 def change_invite(request):
-    if get_creator(request) == request.user:
+    """
+
+    :param request:
+    :return:
+    """
+    if __get_creator_by_invitation_request(request) == request.user:
         Invitation.objects.filter(id=request.POST.get('id')).update(count=request.POST.get('count'))
     else:
-        raise Http404
-    return HttpResponseRedirect('/profile')
+        raise PermissionDenied
+    return HttpResponseRedirect(reverse('dashboard'))
 
 
-@login_required(login_url='/admin')
+@login_required
 def delete_invite(request):
-    if get_creator(request) == request.user:
+    """
+
+    :param request:
+    :return:
+    """
+    if __get_creator_by_invitation_request(request) == request.user:
         Invitation.objects.filter(id=request.POST.get('id')).delete()
     else:
-        raise Http404
-    return HttpResponseRedirect('/profile')
+        raise PermissionDenied
+    return HttpResponseRedirect(reverse('dashboard'))
 
 
-def get_creator(request):
+def change_decision(request):
+    """
+
+    :param request:
+    :return:
+    """
+    Decision.objects.filter(invitation=int(request.POST.get('id'))).update(is_valid=False)
+    new_decision = Decision(
+        invitation_id=int(request.POST.get('id'))
+    )
+    if request.POST.get('decision') == 'yes':
+        new_decision.decision = True
+    elif request.POST.get('decision') == 'no':
+        new_decision.decision = False
+    new_decision.save()
+
+    return HttpResponseRedirect(reverse('show_invitation', args=[request.POST.get('key')]))
+
+
+# Utils
+
+
+def __get_creator_by_invitation_request(request):
     return Event.objects.filter(
         id=Invitation.objects.filter(
             id=int(request.POST.get('id'))
         ).first().event.id
     ).first().creator
-
-
-def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip

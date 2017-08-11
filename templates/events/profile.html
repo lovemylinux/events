@@ -1,6 +1,6 @@
 {% extends 'events/base.html' %}
 {% block title %}
-    Профиль
+    Панель управления
 {% endblock %}
 {% if user.is_authenticated %}
     {% block content %}
@@ -36,9 +36,9 @@
                                 <td>{{ i.event }}</td>
                                 <td>{{ i.recipient }}</td>
                                 <td>
-                                    <a href="{% url 'invitation' i.key %}">{{ domain_port }}{% url 'invitation' i.key %}</a>
+                                    <a href="{% url 'show_invitation' i.key %}">{{ domain_port }}{% url 'show_invitation' i.key %}</a>
                                 </td>
-                                <form class="form" method="POST" action="/api/invitations/edit/{{i.id}}">
+                                <form class="form" method="POST" action="{% url 'api_change_invite' %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="id" value="{{ i.id }}">
                                     <td width="200px">
@@ -50,7 +50,7 @@
                                         <button type="submit" class="btn btn-primary" id="submit">изменить</button>
                                     </td>
                                 </form>
-                                <form class="form" method="POST" action="/api/invitations/delete/{{i.id}}">
+                                <form class="form" method="POST" action="{% url 'api_delete_invite' %}">
                                     {% csrf_token %}
                                     <td>
                                         <button type="submit" value="{{ i.id }}" name="id" class="btn btn-danger" id="delete">
@@ -69,7 +69,7 @@
 
         <script>
             $('#filter').click(function() {
-                window.location.href = '/profile?filter_by_event=' + $('#event_selector').val();
+                window.location.href = '{% url 'dashboard' %}' + '?filter_by_event=' + $('#event_selector').val();
             });
         </script>
     {% endblock %}

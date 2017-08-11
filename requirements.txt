@@ -6,8 +6,6 @@ click==6.6
 dj-database-url==0.4.2
 dj-static==0.0.6
 Django==1.11.4
-django-bootstrap-static==3.3.7.1
-django-twitter-bootstrap==3.3.0
 extras==0.0.3
 fixtures==2.0.0
 gunicorn==19.7.1

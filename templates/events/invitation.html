@@ -6,9 +6,9 @@
 {% endblock %}
 {% block content %}
     <div class="content">
-            <div>
-                <h1>Просмотр приглашения</h1>
-            </div>
+        <div>
+            <h1>Просмотр приглашения</h1>
+        </div>
         <table class="table table-striped">
         <tbody>
             <tr>
@@ -17,7 +17,7 @@
             </tr>
             <tr>
                 <td>Дата: </td>
-                <td>{{ event.dtm }}</td>
+                <td>{{ event.dtm|date:'H:i, d E Y' }}</td>
             </tr>
             <tr>
                 <td>Описание: </td>
@@ -29,8 +29,10 @@
             </tr>
             <tr>
                 <td>Фото: </td>
-                <td> <img style="max-height:500px; max-width:500px; height:auto; width:auto;"
-                                    src="/static/{{ event.image }}"
+                <td>
+                    <img
+                        style="max-height:500px; max-width:500px; height:auto; width:auto;"
+                        src="/static/{{ event.image }}"
                     >
                 </td>
             </tr>
@@ -44,13 +46,13 @@
             </tr>
             <tr>
                 <td>Крайний срок: </td>
-                <td>{{ event.deadline }}</td>
+                <td>{{ event.deadline|date:'H:i, d E Y' }}</td>
             </tr>
             <tr>
                 <td>
                 </td>
                 <td>
-                    <form class="form-inline" method="POST" action="/api/invitations/decision">
+                    <form class="form-inline" method="POST" action="{% url 'api_change_decision' %}">
                         {% csrf_token %}
                         <input type="hidden" name="key" value="{{ invitation.key }}">
                         <input type="hidden" name="id" value="{{ invitation.id }}">
