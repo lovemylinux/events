@@ -114,9 +114,6 @@ MEDIA_URL = '/media/'
 if os.getcwd() == '/app':
     import dj_database_url
 
-    PROJECT_DOMAIN = 'evening-ocean-72138.herokuapp.com'
-    PROJECT_PORT = ''
-
     DATABASES = {
         'default': dj_database_url.config(default='postgres://localhost')
     }

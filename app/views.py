@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, Http404
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -62,11 +62,7 @@ def show_invitation(request, key):
     Страница, показывающая информацию о приглашении
     :param key: Хэш приглашения
     """
-    target_invitation = Invitation.objects.filter(key=key).first()
-
-    if target_invitation is None:
-        raise Http404
-
+    target_invitation = get_object_or_404(Invitation, key=key)
     target_event = target_invitation.event
 
     context = {
@@ -75,13 +71,12 @@ def show_invitation(request, key):
     }
 
     # Логирование
-    new_hit = Hit(
+    Hit.objects.create(
         invitation_id=target_invitation.id,
         user_agent=request.META['HTTP_USER_AGENT'],
         ip=request.META.get('REMOTE_ADDR'),
         referal=request.META.get('HTTP_REFERER'),
     )
-    new_hit.save()
 
     # Изменить стиль кнопок
     if Decision.objects.filter(invitation=int(target_invitation.id)).last().decision is True:
@@ -115,10 +110,7 @@ def add_invite(request):
         )
         if new_invitation.event.creator == request.user:
             new_invitation.save()
-            new_decision = Decision(
-                invitation_id=int(new_invitation.id)
-            )
-            new_decision.save()
+            Decision.objects.create(invitation_id=int(new_invitation.id))
         else:
             raise PermissionDenied
     return HttpResponseRedirect(reverse('dashboard'))
@@ -159,15 +151,10 @@ def change_decision(request):
     :return:
     """
     Decision.objects.filter(invitation=int(request.POST.get('id'))).update(is_valid=False)
-    new_decision = Decision(
-        invitation_id=int(request.POST.get('id'))
+    Decision.objects.create(
+        invitation_id=int(request.POST.get('id')),
+        decision=True if request.POST.get('decision') == 'yes' else False,
     )
-    if request.POST.get('decision') == 'yes':
-        new_decision.decision = True
-    elif request.POST.get('decision') == 'no':
-        new_decision.decision = False
-    new_decision.save()
-
     return HttpResponseRedirect(reverse('show_invitation', args=[request.POST.get('key')]))
 
 
