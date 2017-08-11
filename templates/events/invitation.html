@@ -5,72 +5,56 @@
     Приглашение
 {% endblock %}
 {% block content %}
-    <div class="content">
-        <div>
-            <h1>Просмотр приглашения</h1>
+    <div class="content inv-content">
+        <h2>Приглашение</h2>
+         <img src="/media/images/{{ event.image }}" style="margin-bottom: 15px;" class="img-thumbnail inv-image" alt="фото {{ event.name }}">
+        <div class="list-group inv-list" style="text-align: left;">
+            <p href="#" class="list-group-item list-group-item-success">Мероприятие: {{ event.name }}</p>
+            <p href="#" class="list-group-item list-group-item-info">Дата: {{ event.dtm|date:'H:i, d E Y' }}</p>
+            <p href="#" class="list-group-item list-group-item-info">
+                Адрес: <a href="http://maps.google.com/?q={{event.lat|unlocalize}},{{event.lon|unlocalize}}">
+                            {{ event.address }}
+                        </a>
+            </p>
+            <p href="#" class="list-group-item list-group-item-info">Описание: {{ event.description }}</p>
+            <p href="#" class="list-group-item list-group-item-info">Создатель: {{ event.creator }}</p>
+            <p href="#" class="list-group-item list-group-item-info">Получатель: {{ invitation.recipient }}</p>
+            <p href="#" class="list-group-item list-group-item-info">Количество: {{ invitation.count }}</p>
+            <p href="#" class="list-group-item list-group-item-danger">Крайний срок: {{ event.deadline|date:'H:i, d E Y' }}</p>
         </div>
-        <table class="table table-striped">
-        <tbody>
-            <tr>
-                <td>Мероприятие: </td>
-                <td>{{ event.name }}</td>
-            </tr>
-            <tr>
-                <td>Дата: </td>
-                <td>{{ event.dtm|date:'H:i, d E Y' }}</td>
-            </tr>
-            <tr>
-                <td>Описание: </td>
-                <td>{{ event.description }}</td>
-            </tr>
-            <tr>
-                <td>Создатель: </td>
-                <td>{{ event.creator }}</td>
-            </tr>
-            <tr>
-                <td>Фото: </td>
-                <td>
-                    <img
-                        style="max-height:500px; max-width:500px; height:auto; width:auto;"
-                        src="/static/{{ event.image }}"
-                    >
-                </td>
-            </tr>
-            <tr>
-                <td>Получатель: </td>
-                <td>{{ invitation.recipient }}</td>
-            </tr>
-            <tr>
-                <td>Количество: </td>
-                <td>{{ invitation.count }}</td>
-            </tr>
-            <tr>
-                <td>Крайний срок: </td>
-                <td>{{ event.deadline|date:'H:i, d E Y' }}</td>
-            </tr>
-            <tr>
-                <td>
-                </td>
-                <td>
-                    <form class="form-inline" method="POST" action="{% url 'api_change_decision' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="key" value="{{ invitation.key }}">
-                        <input type="hidden" name="id" value="{{ invitation.id }}">
-                        <div class="form-group">
-                            <button type="submit" value="no" name="decision" {{ false.1 }} {{deadline}} class="btn {{ false.0 }} {{deadline}}" id="no">
-                                Точно не иду
-                            </button>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" value="yes" name="decision" {{ true.1 }} {{deadline}} class="btn {{ true.0 }} {{deadline}}" id="yes">
-                                Иду
-                            </button>
-                        </div>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+
+        <span class="addtocalendar atc-style-blue" data-calendars="iCalendar, Google Calendar">
+                    <a class="atcb-link">Добавить в календарь</a>
+                    <var class="atc_event">
+                        <var class="atc_date_start">{{ event.dtm|date:'Y-m-d H:i:s' }}</var>
+                        <var class="atc_date_end">{{ event.dtm|date:'Y-m-d H:i:s' }}</var>
+                        <var class="atc_timezone">Europe/Moscow</var>
+                        <var class="atc_title">{{ event.name }}</var>
+                        <var class="atc_description">{{ event.description }}</var>
+                        <var class="atc_location">{{ event.address }}</var>
+                        <var class="atc_organizer">{{ event.creator }}</var>
+                        <var class="atc_organizer_email"></var>
+                    </var>
+        </span>
+
+        <form class="form-inline" align="left" style="padding: 20px 0 20px 0;" method="POST" action="{% url 'api_change_decision' %}">
+            {% csrf_token %}
+            <input type="hidden" name="key" value="{{ invitation.key }}">
+            <input type="hidden" name="id" value="{{ invitation.id }}">
+            <div class="form-group">
+                <button type="submit" value="no" name="decision" {{ no.1 }} {{deadline}} class="btn {{ no.0 }} {{deadline}}" id="no">
+                    Точно не иду
+                </button>
+            </div>
+            <div class="form-group">
+                <button type="submit" value="yes" name="decision" {{ yes.1 }} {{deadline}} class="btn {{ yes.0 }} {{deadline}}" id="yes">
+                    Иду
+                </button>
+            </div>
+        </form>
+
+
+
         <div id="map" class="map-container"></div>
 
         <script>
@@ -85,5 +69,14 @@
         </script>
 
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDuTTIyFhRVh6Ts0EtUlhHJyObUfSC9Tm0&callback=myMap"></script>
+
+        <script type="text/javascript">(function () {
+            if (window.addtocalendar)if(typeof window.addtocalendar.start == "function")return;
+            if (window.ifaddtocalendar == undefined) { window.ifaddtocalendar = 1;
+                var d = document, s = d.createElement('script'), g = 'getElementsByTagName';
+                s.type = 'text/javascript';s.charset = 'UTF-8';s.async = true;
+                s.src = ('https:' == window.location.protocol ? 'https' : 'http')+'://addtocalendar.com/atc/1.5/atc.min.js';
+                var h = d[g]('body')[0];h.appendChild(s); }})();
+        </script>
     </div>
 {% endblock %}

@@ -68,6 +68,7 @@ def show_invitation(request, key):
     context = {
         'invitation': target_invitation,
         'event': target_event,
+        'key': key,
     }
 
     # Логирование
@@ -80,11 +81,11 @@ def show_invitation(request, key):
 
     # Изменить стиль кнопок
     if Decision.objects.filter(invitation=int(target_invitation.id)).last().decision is True:
-        context['true'] = ['btn-primary', 'disabled']
-        context['false'] = ['', '']
+        context['yes'] = ['btn-primary', 'disabled']
+        context['no'] = ['', '']
     else:
-        context['false'] = ['btn-primary', 'disabled']
-        context['true'] = ['', '']
+        context['no'] = ['btn-primary', 'disabled']
+        context['yes'] = ['', '']
     if datetime.now(timezone.utc) > context['event'].deadline:
         context['deadline'] = 'disabled'
 

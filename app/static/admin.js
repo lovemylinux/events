@@ -31,6 +31,7 @@ function buildInvitationsBlocks(e) {
     `;
     $('.invitations').empty();
     $('.invitations').append($(filling));
+    $('#submit').show();
 }
 
 

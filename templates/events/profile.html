@@ -36,7 +36,7 @@
                                 <td>{{ i.event }}</td>
                                 <td>{{ i.recipient }}</td>
                                 <td>
-                                    <a href="{% url 'show_invitation' i.key %}">{{ domain_port }}{% url 'show_invitation' i.key %}</a>
+                                    <a href="{% url 'show_invitation' i.key %}">{% url 'show_invitation' i.key %}</a>
                                 </td>
                                 <form class="form" method="POST" action="{% url 'api_change_invite' %}">
                                     {% csrf_token %}
