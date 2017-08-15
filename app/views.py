@@ -4,9 +4,10 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from datetime import datetime, timezone
+from types import SimpleNamespace as Placeholder
 import uuid
 
-from .models import Event, Invitation, Decision, Hit
+from .models import Event, Invitation, Hit
 
 
 def show_index_page(request):
@@ -72,22 +73,19 @@ def show_invitation(request, key):
     }
 
     # Логирование
-    Hit.objects.create(
-        invitation_id=target_invitation.id,
-        user_agent=request.META['HTTP_USER_AGENT'],
-        ip=request.META.get('REMOTE_ADDR'),
-        referal=request.META.get('HTTP_REFERER'),
-    )
+    if __get_creator_by_invitation_request(key=key) != request.user and ('api' not in request.session):
+        Hit.objects.filter(invitation=target_invitation).update(is_valid=False)
+        Hit.objects.create(
+            invitation_id=target_invitation.id,
+            user_agent=request.META['HTTP_USER_AGENT'],
+            ip=request.META.get('REMOTE_ADDR'),
+            referal=request.META.get('HTTP_REFERER'),
+            decision=(Hit.objects.order_by('-dtm').first() or Placeholder(decision=False)).decision,
+        )
 
-    # Изменить стиль кнопок
-    if Decision.objects.filter(invitation=int(target_invitation.id)).last().decision is True:
-        context['yes'] = ['btn-primary', 'disabled']
-        context['no'] = ['', '']
-    else:
-        context['no'] = ['btn-primary', 'disabled']
-        context['yes'] = ['', '']
-    if datetime.now(timezone.utc) > context['event'].deadline:
-        context['deadline'] = 'disabled'
+        # Изменить стиль кнопок
+        context['decision'] = ['no', 'yes'][Hit.objects.filter(invitation=target_invitation.id).order_by('-dtm').first().decision]
+        context['deadline'] = datetime.now(timezone.utc) > target_event.deadline
 
     return render(request, 'events/invitation.html', context=context)
 
@@ -111,7 +109,6 @@ def add_invite(request):
         )
         if new_invitation.event.creator == request.user:
             new_invitation.save()
-            Decision.objects.create(invitation_id=int(new_invitation.id))
         else:
             raise PermissionDenied
     return HttpResponseRedirect(reverse('dashboard'))
@@ -124,7 +121,7 @@ def change_invite(request):
     :param request:
     :return:
     """
-    if __get_creator_by_invitation_request(request) == request.user:
+    if __get_creator_by_invitation_request(id=request.POST.get('id')) == request.user:
         Invitation.objects.filter(id=request.POST.get('id')).update(count=request.POST.get('count'))
     else:
         raise PermissionDenied
@@ -138,7 +135,7 @@ def delete_invite(request):
     :param request:
     :return:
     """
-    if __get_creator_by_invitation_request(request) == request.user:
+    if __get_creator_by_invitation_request(id=request.POST.get('id')) == request.user:
         Invitation.objects.filter(id=request.POST.get('id')).delete()
     else:
         raise PermissionDenied
@@ -151,20 +148,25 @@ def change_decision(request):
     :param request:
     :return:
     """
-    Decision.objects.filter(invitation=int(request.POST.get('id'))).update(is_valid=False)
-    Decision.objects.create(
-        invitation_id=int(request.POST.get('id')),
-        decision=True if request.POST.get('decision') == 'yes' else False,
-    )
+    hits = Hit.objects.filter(invitation=int(request.POST.get('id')))
+    if hits.first():
+        h = hits.order_by('-dtm').first()
+        h.decision = request.POST.get('decision') == 'yes'
+        h.save()
+    else:
+        Hit.objects.create(
+            invitation_id=Invitation.objects.filter(key=request.POST.get('key')).first().id,
+            user_agent=request.META['HTTP_USER_AGENT'],
+            ip=request.META.get('REMOTE_ADDR'),
+            referal=request.META.get('HTTP_REFERER'),
+            decision=request.POST.get('decision') == 'yes',
+        )
+    request.session['api'] = True
     return HttpResponseRedirect(reverse('show_invitation', args=[request.POST.get('key')]))
 
 
 # Utils
 
 
-def __get_creator_by_invitation_request(request):
-    return Event.objects.filter(
-        id=Invitation.objects.filter(
-            id=int(request.POST.get('id'))
-        ).first().event.id
-    ).first().creator
+def __get_creator_by_invitation_request(**kwargs):
+    return Event.objects.filter(id=Invitation.objects.filter(**kwargs).first().event.id).first().creator

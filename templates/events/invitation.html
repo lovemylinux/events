@@ -23,9 +23,9 @@
             <p href="#" class="list-group-item list-group-item-danger">Крайний срок: {{ event.deadline|date:'H:i, d E Y' }}</p>
         </div>
 
-        <span class="addtocalendar atc-style-blue" data-calendars="iCalendar, Google Calendar">
+        <span class="addtocalendar atc-style-blue" data-calendars="iCalendar, Google Calendar" data-secure="auto">
                     <a class="atcb-link">Добавить в календарь</a>
-                    <var class="atc_event">
+                    <var class="atc_event" style="display:none;">
                         <var class="atc_date_start">{{ event.dtm|date:'Y-m-d H:i:s' }}</var>
                         <var class="atc_date_end">{{ event.dtm|date:'Y-m-d H:i:s' }}</var>
                         <var class="atc_timezone">Europe/Moscow</var>

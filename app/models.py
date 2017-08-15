@@ -58,25 +58,15 @@ class Hit(models.Model):
     user_agent = models.CharField(max_length=256)
     referal = models.URLField(null=True)
     ip = models.GenericIPAddressField()
-
-    def __str__(self):
-        return '{}({})'.format(self.invitation.recipient, self.dtm.strftime("%Y-%m-%d %H:%M:%S"))
-
-    def __repr__(self):
-        return 'Hit({}, {})'.format(self.id, self.user_agent)
-
-
-class Decision(models.Model):
-    invitation = models.ForeignKey(Invitation, on_delete=models.CASCADE)
-    dtm = models.DateTimeField(auto_now_add=True)
     decision = models.BooleanField(default=False)
     is_valid = models.BooleanField(default=True)
 
     def __str__(self):
-        return '{}({})'.format(self.invitation.recipient, self.decision)
+        return '{}({},{})'.format(self.invitation.recipient, self.decision, self.dtm.strftime("%Y-%m-%d %H:%M"))
 
     def __repr__(self):
-        return 'Decision({}, {})'.format(self.id, self.decision)
+        return 'Hit({}, {})'.format(self.id, self.decision)
+
 
 
 
