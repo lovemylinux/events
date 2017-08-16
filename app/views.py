@@ -70,6 +70,7 @@ def show_invitation(request, key):
         'invitation': target_invitation,
         'event': target_event,
         'key': key,
+        'deadline': datetime.now(timezone.utc) > target_event.deadline,
     }
 
     # Логирование
@@ -83,9 +84,14 @@ def show_invitation(request, key):
             decision=(Hit.objects.order_by('-dtm').first() or Placeholder(decision=False)).decision,
         )
 
-        # Изменить стиль кнопок
-        context['decision'] = ['no', 'yes'][Hit.objects.filter(invitation=target_invitation.id).order_by('-dtm').first().decision]
-        context['deadline'] = datetime.now(timezone.utc) > target_event.deadline
+    # Изменить стиль кнопок
+    try:
+        if Hit.objects.filter(invitation=target_invitation.id).order_by('-dtm').first().decision:
+            context['decision'] = True
+        else:
+            context['decision'] = False
+    except AttributeError:
+        context['decision'] = False
 
     return render(request, 'events/invitation.html', context=context)
 
