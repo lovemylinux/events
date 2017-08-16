@@ -12,7 +12,7 @@ from .models import Event, Invitation, Hit
 
 def show_index_page(request):
     """
-    Показать главноую страницу
+    Show main page
     :param request:
     """
     return render(request, 'events/index.html')
@@ -50,7 +50,7 @@ def show_dashboard_page(request):
 @login_required
 def show_create_invite_page(request):
     """
-    Страница создания новых инвайтов
+    Page for creating new events
     :param request:
     """
     return render(request, 'events/invite.html', context={
@@ -60,8 +60,8 @@ def show_create_invite_page(request):
 
 def show_invitation(request, key):
     """
-    Страница, показывающая информацию о приглашении
-    :param key: Хэш приглашения
+    Page that show invitation
+    :param key: invitation's hash
     """
     target_invitation = get_object_or_404(Invitation, key=key)
     target_event = target_invitation.event
@@ -73,7 +73,7 @@ def show_invitation(request, key):
         'deadline': datetime.now(timezone.utc) > target_event.deadline,
     }
 
-    # Логирование
+    # Logging
     if __get_creator_by_invitation_request(key=key) != request.user and ('api' not in request.session):
         Hit.objects.filter(invitation=target_invitation).update(is_valid=False)
         Hit.objects.create(
@@ -84,7 +84,7 @@ def show_invitation(request, key):
             decision=(Hit.objects.order_by('-dtm').first() or Placeholder(decision=False)).decision,
         )
 
-    # Изменить стиль кнопок
+    # For button style
     try:
         if Hit.objects.filter(invitation=target_invitation.id).order_by('-dtm').first().decision:
             context['decision'] = True
@@ -102,7 +102,7 @@ def show_invitation(request, key):
 @login_required
 def add_invite(request):
     """
-    Создать новые инвайты
+    Create new invites
     :param request:
     :return:
     """
