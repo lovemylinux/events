@@ -110,25 +110,25 @@ STATIC_ROOT = 'app/static'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-# Если запускаем на Heroku...
+# if running at Heroku...
 if os.getcwd() == '/app':
     import dj_database_url
 
     DATABASES = {
         'default': dj_database_url.config(default='postgres://localhost')
     }
-    # Поддержка заголовка 'X-Forwarded-Proto' для request.is_secure().
+    # 'X-Forwarded-Proto' for request.is_secure().
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    # Разрешены все заголовки хостов.
+
     ALLOWED_HOSTS = ['*']
 
-    # Конфигурация статических ресурсов
+    # Config static resurses
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
     STATICFILES_DIRS = (
         os.path.join(BASE_DIR, 'static'),
     )
-# ... иначе импортируем локальные настройки
+# import local_settings
 else:
     try:
         from .local_settings import *
