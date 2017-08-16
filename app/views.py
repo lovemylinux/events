@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from datetime import datetime, timezone
+from django.utils import timezone
+from datetime import datetime
 from types import SimpleNamespace as Placeholder
 import uuid
 
